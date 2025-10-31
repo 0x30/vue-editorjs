@@ -31,6 +31,13 @@ export interface UploadResponse {
   success: 1 | 0;
   file: {
     url: string;
+    // 图片相关字段
+    name?: string;
+    size?: number;
+    // 附件相关字段
+    title?: string;
+    extension?: string;
+    // 其他自定义字段
     [key: string]: any;
   };
 }
