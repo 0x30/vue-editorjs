@@ -1,5 +1,5 @@
 import { defineComponent, onMounted, onBeforeUnmount, ref, type PropType } from 'vue'
-import EditorJS from '@editorjs/editorjs'
+import EditorJS, { type OutputData } from '@editorjs/editorjs'
 import { zhCN } from '../locales'
 import Header from '@editorjs/header'
 import NestedList from "@editorjs/nested-list";
@@ -31,6 +31,9 @@ export interface UploadResponse {
 // 上传函数类型
 export type UploadFunction = (file: File) => Promise<UploadResponse>
 
+// 导出 EditorJS 数据类型
+export type { OutputData }
+
 export default defineComponent({
   name: "Editor",
   props: {
@@ -41,6 +44,16 @@ export default defineComponent({
     placeholder: {
       type: String,
       default: "点击这里开始编辑...",
+    },
+    // 只读模式
+    readOnly: {
+      type: Boolean,
+      default: false,
+    },
+    // 初始数据
+    data: {
+      type: Object as PropType<OutputData>,
+      required: false,
     },
     // 图片上传函数
     onUploadImage: {
@@ -91,6 +104,12 @@ export default defineComponent({
       editorInstance.value = new EditorJS({
         holder: props.holderId,
         placeholder: props.placeholder,
+        
+        // 只读模式
+        readOnly: props.readOnly,
+        
+        // 初始数据
+        data: props.data,
 
         // 中文 i18n 配置
         i18n: zhCN,
