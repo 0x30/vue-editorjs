@@ -3,6 +3,7 @@ import {
   onMounted,
   onBeforeUnmount,
   ref,
+  watch,
   type PropType,
 } from "vue";
 import EditorJS, { type OutputData } from "@editorjs/editorjs";
@@ -327,6 +328,16 @@ export default defineComponent({
         },
       });
     });
+
+    // 监听 readOnly 变化，动态切换编辑器的只读状态
+    watch(
+      () => props.readOnly,
+      async (newValue) => {
+        if (editorInstance.value && editorInstance.value.readOnly) {
+          await editorInstance.value.readOnly.toggle(newValue);
+        }
+      }
+    );
 
     onBeforeUnmount(() => {
       if (editorInstance.value) {
