@@ -1,7 +1,13 @@
-import { defineComponent, onMounted, onBeforeUnmount, ref, type PropType } from 'vue'
-import EditorJS, { type OutputData } from '@editorjs/editorjs'
-import { zhCN } from '../locales'
-import Header from '@editorjs/header'
+import {
+  defineComponent,
+  onMounted,
+  onBeforeUnmount,
+  ref,
+  type PropType,
+} from "vue";
+import EditorJS, { type OutputData } from "@editorjs/editorjs";
+import { zhCN } from "../locales";
+import Header from "@editorjs/header";
 import NestedList from "@editorjs/nested-list";
 import Paragraph from "@editorjs/paragraph";
 import Image from "@editorjs/image";
@@ -21,18 +27,24 @@ import AttachesTool from "@editorjs/attaches";
 
 // 上传响应接口
 export interface UploadResponse {
-  success: 1 | 0
+  success: 1 | 0;
   file: {
-    url: string
-    [key: string]: any
-  }
+    url: string;
+    [key: string]: any;
+  };
 }
 
 // 上传函数类型
-export type UploadFunction = (file: File) => Promise<UploadResponse>
+export type UploadFunction = (file: File) => Promise<UploadResponse>;
+
+// onChange 回调类型
+export type OnChangeCallback = (data: OutputData) => void;
+
+// onReady 回调类型
+export type OnReadyCallback = () => void;
 
 // 导出 EditorJS 数据类型
-export type { OutputData }
+export type { OutputData };
 
 export default defineComponent({
   name: "Editor",
@@ -65,15 +77,26 @@ export default defineComponent({
       type: Function as PropType<UploadFunction>,
       required: false,
     },
+    // 内容变化回调
+    onChange: {
+      type: Function as PropType<OnChangeCallback>,
+      required: false,
+    },
+    // 编辑器就绪回调
+    onReady: {
+      type: Function as PropType<OnReadyCallback>,
+      required: false,
+    },
   },
-  emits: ["ready", "change"],
-  setup(props, { emit }) {
+  setup(props) {
     const editorInstance = ref<EditorJS | null>(null);
 
     // 默认图片上传处理（使用本地预览）
-    const defaultImageUploader = async (file: File): Promise<UploadResponse> => {
+    const defaultImageUploader = async (
+      file: File
+    ): Promise<UploadResponse> => {
       // 创建本地预览 URL
-      const url = URL.createObjectURL(file)
+      const url = URL.createObjectURL(file);
       return {
         success: 1,
         file: {
@@ -81,33 +104,33 @@ export default defineComponent({
           // 可以添加更多信息
           name: file.name,
           size: file.size,
-        }
-      }
-    }
+        },
+      };
+    };
 
     // 默认文件上传处理
     const defaultFileUploader = async (file: File): Promise<UploadResponse> => {
-      const url = URL.createObjectURL(file)
+      const url = URL.createObjectURL(file);
       return {
         success: 1,
         file: {
           url,
           name: file.name,
           size: file.size,
-          extension: file.name.split('.').pop() || '',
+          extension: file.name.split(".").pop() || "",
           title: file.name, // 默认使用文件名作为标题
-        }
-      }
-    }
+        },
+      };
+    };
 
     onMounted(() => {
       editorInstance.value = new EditorJS({
         holder: props.holderId,
         placeholder: props.placeholder,
-        
+
         // 只读模式
         readOnly: props.readOnly,
-        
+
         // 初始数据
         data: props.data,
 
@@ -156,10 +179,10 @@ export default defineComponent({
                 uploadByFile: async (file: File) => {
                   // 如果提供了自定义上传函数，使用它
                   if (props.onUploadImage) {
-                    return await props.onUploadImage(file)
+                    return await props.onUploadImage(file);
                   }
                   // 否则使用默认的本地预览
-                  return await defaultImageUploader(file)
+                  return await defaultImageUploader(file);
                 },
                 /**
                  * 通过 URL 上传图片
@@ -168,8 +191,8 @@ export default defineComponent({
                 uploadByUrl: async (url: string) => {
                   return {
                     success: 1,
-                    file: { url }
-                  }
+                    file: { url },
+                  };
                 },
               },
             },
@@ -270,8 +293,8 @@ export default defineComponent({
           attaches: {
             class: AttachesTool,
             config: {
-              endpoint: '/api/upload/file', // 可选：服务器端点
-              buttonText: '选择文件',
+              endpoint: "/api/upload/file", // 可选：服务器端点
+              buttonText: "选择文件",
               uploader: {
                 /**
                  * 上传附件文件
@@ -280,10 +303,10 @@ export default defineComponent({
                 uploadByFile: async (file: File) => {
                   // 如果提供了自定义上传函数，使用它
                   if (props.onUploadFile) {
-                    return await props.onUploadFile(file)
+                    return await props.onUploadFile(file);
                   }
                   // 否则使用默认的本地预览
-                  return await defaultFileUploader(file)
+                  return await defaultFileUploader(file);
                 },
               },
             },
@@ -291,12 +314,16 @@ export default defineComponent({
         },
 
         onChange: async (api) => {
-          const data = await api.saver.save();
-          emit("change", data);
+          if (props.onChange) {
+            const data = await api.saver.save();
+            props.onChange(data);
+          }
         },
 
         onReady: () => {
-          emit("ready");
+          if (props.onReady) {
+            props.onReady();
+          }
         },
       });
     });
