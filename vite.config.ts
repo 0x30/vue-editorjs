@@ -16,7 +16,9 @@ export default defineConfig(({ mode }) => {
           insertTypesEntry: true,
           tsconfigPath: './tsconfig.app.json',
           outDir: 'dist',
-        }),
+          rollupTypes: true,
+          include: ['lib/index.ts', 'src/**/*']
+        })
       ],
       build: {
         lib: {
