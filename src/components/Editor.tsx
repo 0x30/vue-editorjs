@@ -1,4 +1,4 @@
-import { defineComponent, onMounted, onBeforeUnmount, ref } from 'vue'
+import { defineComponent, onMounted, onBeforeUnmount, ref, type PropType } from 'vue'
 import EditorJS from '@editorjs/editorjs'
 import { zhCN } from '../locales'
 import Header from '@editorjs/header'
@@ -6,7 +6,6 @@ import List from "@editorjs/list";
 import NestedList from "@editorjs/nested-list";
 import Paragraph from "@editorjs/paragraph";
 import Image from "@editorjs/image";
-import SimpleImage from "@editorjs/simple-image";
 import Code from "@editorjs/code";
 import LinkTool from "@editorjs/link";
 import Quote from "@editorjs/quote";
@@ -21,6 +20,18 @@ import Underline from "@editorjs/underline";
 import RawTool from "@editorjs/raw";
 import AttachesTool from "@editorjs/attaches";
 
+// 上传响应接口
+export interface UploadResponse {
+  success: 1 | 0
+  file: {
+    url: string
+    [key: string]: any
+  }
+}
+
+// 上传函数类型
+export type UploadFunction = (file: File) => Promise<UploadResponse>
+
 export default defineComponent({
   name: "Editor",
   props: {
@@ -32,10 +43,49 @@ export default defineComponent({
       type: String,
       default: "点击这里开始编辑...",
     },
+    // 图片上传函数
+    onUploadImage: {
+      type: Function as PropType<UploadFunction>,
+      required: false,
+    },
+    // 文件/附件上传函数
+    onUploadFile: {
+      type: Function as PropType<UploadFunction>,
+      required: false,
+    },
   },
   emits: ["ready", "change"],
   setup(props, { emit }) {
     const editorInstance = ref<EditorJS | null>(null);
+
+    // 默认图片上传处理（使用本地预览）
+    const defaultImageUploader = async (file: File): Promise<UploadResponse> => {
+      // 创建本地预览 URL
+      const url = URL.createObjectURL(file)
+      return {
+        success: 1,
+        file: {
+          url,
+          // 可以添加更多信息
+          name: file.name,
+          size: file.size,
+        }
+      }
+    }
+
+    // 默认文件上传处理
+    const defaultFileUploader = async (file: File): Promise<UploadResponse> => {
+      const url = URL.createObjectURL(file)
+      return {
+        success: 1,
+        file: {
+          url,
+          name: file.name,
+          size: file.size,
+          extension: file.name.split('.').pop() || '',
+        }
+      }
+    }
 
     onMounted(() => {
       editorInstance.value = new EditorJS({
@@ -89,28 +139,31 @@ export default defineComponent({
             class: Image,
             config: {
               uploader: {
-                uploadByFile(file: File) {
-                  // 这里应该实现文件上传逻辑
-                  // 暂时返回一个示例 URL
-                  return Promise.resolve({
-                    success: 1,
-                    file: {
-                      url: URL.createObjectURL(file),
-                    },
-                  });
+                /**
+                 * 通过文件上传图片
+                 * @param file - 要上传的文件
+                 */
+                uploadByFile: async (file: File) => {
+                  // 如果提供了自定义上传函数，使用它
+                  if (props.onUploadImage) {
+                    return await props.onUploadImage(file)
+                  }
+                  // 否则使用默认的本地预览
+                  return await defaultImageUploader(file)
                 },
-                uploadByUrl(url: string) {
-                  return Promise.resolve({
+                /**
+                 * 通过 URL 上传图片
+                 * @param url - 图片 URL
+                 */
+                uploadByUrl: async (url: string) => {
+                  return {
                     success: 1,
-                    file: { url },
-                  });
+                    file: { url }
+                  }
                 },
               },
             },
           },
-
-          // 简单图片
-          simpleImage: SimpleImage,
 
           // 代码块
           code: {
@@ -208,16 +261,17 @@ export default defineComponent({
             class: AttachesTool,
             config: {
               uploader: {
-                uploadByFile(file: File) {
-                  return Promise.resolve({
-                    success: 1,
-                    file: {
-                      url: URL.createObjectURL(file),
-                      size: file.size,
-                      name: file.name,
-                      extension: file.name.split(".").pop(),
-                    },
-                  });
+                /**
+                 * 上传附件文件
+                 * @param file - 要上传的文件
+                 */
+                uploadByFile: async (file: File) => {
+                  // 如果提供了自定义上传函数，使用它
+                  if (props.onUploadFile) {
+                    return await props.onUploadFile(file)
+                  }
+                  // 否则使用默认的本地预览
+                  return await defaultFileUploader(file)
                 },
               },
             },

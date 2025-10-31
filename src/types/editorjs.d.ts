@@ -111,16 +111,6 @@ declare module '@editorjs/underline' {
   }
 }
 
-declare module '@editorjs/simple-image' {
-  import { BlockTool, BlockToolConstructorOptions } from '@editorjs/editorjs'
-  export default class SimpleImage implements BlockTool {
-    constructor(options: BlockToolConstructorOptions)
-    render(): HTMLElement
-    save(blockContent: HTMLElement): any
-    static get toolbox(): { icon: string; title?: string }
-  }
-}
-
 declare module '@editorjs/link' {
   import { InlineTool } from '@editorjs/editorjs'
   export default class LinkTool implements InlineTool {
