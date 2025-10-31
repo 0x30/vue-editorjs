@@ -28,7 +28,7 @@ export const zhCN = {
       }
     },
     toolNames: {
-      "Text": "文本",
+      "Text": "段落",
       "Heading": "标题",
       "List": "列表",
       "Warning": "警告",
@@ -47,8 +47,7 @@ export const zhCN = {
       "Embed": "嵌入",
       "Underline": "下划线",
       "Attaches": "附件",
-      "Simple Image": "简单图片",
-      "Nested List": "嵌套列表"
+      "Attachment": "附件"
     },
     tools: {
       "warning": {
@@ -113,6 +112,22 @@ export const zhCN = {
       },
       "embed": {
         "Enter a caption": "输入说明"
+      },
+      "attaches": {
+        "Select file to upload": "选择要上传的文件",
+        "File title": "文件标题",
+        "File name": "文件名",
+        "File size": "文件大小",
+        "Download": "下载",
+        "Attach file": "附加文件"
+      },
+      "attachment": {
+        "Select file to upload": "选择要上传的文件",
+        "File title": "文件标题",
+        "File name": "文件名"
+      },
+      "raw": {
+        "Enter HTML code": "输入 HTML 代码"
       }
     },
     blockTunes: {

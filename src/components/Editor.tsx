@@ -2,7 +2,6 @@ import { defineComponent, onMounted, onBeforeUnmount, ref, type PropType } from 
 import EditorJS from '@editorjs/editorjs'
 import { zhCN } from '../locales'
 import Header from '@editorjs/header'
-import List from "@editorjs/list";
 import NestedList from "@editorjs/nested-list";
 import Paragraph from "@editorjs/paragraph";
 import Image from "@editorjs/image";
@@ -116,17 +115,8 @@ export default defineComponent({
             },
           },
 
-          // 列表工具
+          // 多级列表（支持嵌套）
           list: {
-            class: List,
-            inlineToolbar: true,
-            config: {
-              defaultStyle: "unordered",
-            },
-          },
-
-          // 嵌套列表
-          nestedList: {
             class: NestedList,
             inlineToolbar: true,
             config: {
@@ -260,6 +250,8 @@ export default defineComponent({
           attaches: {
             class: AttachesTool,
             config: {
+              endpoint: '/api/upload/file', // 可选：服务器端点
+              buttonText: '选择文件',
               uploader: {
                 /**
                  * 上传附件文件
