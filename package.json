@@ -1,12 +1,49 @@
 {
-  "name": "editor",
-  "private": true,
-  "version": "0.0.0",
+  "name": "@0x30/vue-editorjs",
+  "version": "1.0.0",
+  "description": "A Vue 3 Editor.js component with TypeScript support and Chinese i18n",
   "type": "module",
+  "main": "./dist/vue-editorjs.umd.cjs",
+  "module": "./dist/vue-editorjs.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/vue-editorjs.js",
+      "require": "./dist/vue-editorjs.umd.cjs"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "dev": "vite",
-    "build": "vue-tsc -b && vite build",
-    "preview": "vite preview"
+    "build": "vue-tsc && vite build --mode lib",
+    "build:demo": "vue-tsc -b && vite build",
+    "preview": "vite preview",
+    "prepare": "pnpm build"
+  },
+  "keywords": [
+    "vue",
+    "vue3",
+    "editorjs",
+    "editor",
+    "wysiwyg",
+    "typescript",
+    "tsx",
+    "chinese",
+    "i18n"
+  ],
+  "author": "0x30",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/0x30/vue-editorjs.git"
+  },
+  "peerDependencies": {
+    "vue": "^3.0.0"
   },
   "dependencies": {
     "@editorjs/attaches": "^1.3.2",
@@ -19,18 +56,14 @@
     "@editorjs/image": "^2.10.3",
     "@editorjs/inline-code": "^1.5.2",
     "@editorjs/link": "^2.6.2",
-    "@editorjs/list": "^2.0.8",
     "@editorjs/marker": "^1.4.0",
     "@editorjs/nested-list": "^1.4.3",
     "@editorjs/paragraph": "^2.11.7",
     "@editorjs/quote": "^2.7.6",
     "@editorjs/raw": "^2.5.1",
-    "@editorjs/simple-image": "^1.6.0",
     "@editorjs/table": "^2.4.5",
     "@editorjs/underline": "^1.2.1",
-    "@editorjs/warning": "^1.4.1",
-    "vue": "^3.5.22",
-    "vue-i18n": "^9.14.5"
+    "@editorjs/warning": "^1.4.1"
   },
   "devDependencies": {
     "@types/node": "^24.6.0",
@@ -39,6 +72,8 @@
     "@vue/tsconfig": "^0.8.1",
     "typescript": "~5.9.3",
     "vite": "^7.1.7",
+    "vite-plugin-dts": "^4.5.4",
+    "vue": "^3.5.22",
     "vue-tsc": "^3.1.0"
   }
 }

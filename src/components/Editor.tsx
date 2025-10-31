@@ -5,65 +5,61 @@ import {
   ref,
   watch,
   type PropType,
-} from "vue";
-import EditorJS, { type OutputData } from "@editorjs/editorjs";
-import { zhCN } from "../locales";
-import Header from "@editorjs/header";
-import NestedList from "@editorjs/nested-list";
-import Paragraph from "@editorjs/paragraph";
-import Image from "@editorjs/image";
-import Code from "@editorjs/code";
-import LinkTool from "@editorjs/link";
-import Quote from "@editorjs/quote";
-import Delimiter from "@editorjs/delimiter";
-import Table from "@editorjs/table";
-import Checklist from "@editorjs/checklist";
-import Embed from "@editorjs/embed";
-import Warning from "@editorjs/warning";
-import Marker from "@editorjs/marker";
-import InlineCode from "@editorjs/inline-code";
-import Underline from "@editorjs/underline";
-import RawTool from "@editorjs/raw";
-import AttachesTool from "@editorjs/attaches";
+} from 'vue'
+import EditorJS, { type OutputData } from '@editorjs/editorjs'
+import { zhCN } from '../locales'
+import Header from '@editorjs/header'
+import NestedList from '@editorjs/nested-list'
+import Paragraph from '@editorjs/paragraph'
+import Image from '@editorjs/image'
+import Code from '@editorjs/code'
+import LinkTool from '@editorjs/link'
+import Quote from '@editorjs/quote'
+import Delimiter from '@editorjs/delimiter'
+import Table from '@editorjs/table'
+import Checklist from '@editorjs/checklist'
+import Embed from '@editorjs/embed'
+import Warning from '@editorjs/warning'
+import Marker from '@editorjs/marker'
+import InlineCode from '@editorjs/inline-code'
+import Underline from '@editorjs/underline'
+import RawTool from '@editorjs/raw'
+import AttachesTool from '@editorjs/attaches'
 
 // 上传响应接口
 export interface UploadResponse {
-  success: 1 | 0;
+  success: 1 | 0
   file: {
-    url: string;
+    url: string
     // 图片相关字段
-    name?: string;
-    size?: number;
+    name?: string
+    size?: number
     // 附件相关字段
-    title?: string;
-    extension?: string;
+    title?: string
+    extension?: string
     // 其他自定义字段
-    [key: string]: any;
-  };
+    [key: string]: any
+  }
 }
 
 // 上传函数类型
-export type UploadFunction = (file: File) => Promise<UploadResponse>;
+export type UploadFunction = (file: File) => Promise<UploadResponse>
 
 // onChange 回调类型
-export type OnChangeCallback = (data: OutputData) => void;
+export type OnChangeCallback = (data: OutputData) => void
 
 // onReady 回调类型
-export type OnReadyCallback = () => void;
+export type OnReadyCallback = () => void
 
 // 导出 EditorJS 数据类型
-export type { OutputData };
+export type { OutputData }
 
 export default defineComponent({
-  name: "Editor",
+  name: 'Editor',
   props: {
-    holderId: {
-      type: String,
-      default: "editorjs",
-    },
     placeholder: {
       type: String,
-      default: "点击这里开始编辑...",
+      default: '点击这里开始编辑...',
     },
     // 只读模式
     readOnly: {
@@ -97,14 +93,15 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const editorInstance = ref<EditorJS | null>(null);
+    const editorInstance = ref<EditorJS | null>(null)
+    const editorRef = ref<HTMLDivElement | null>(null)
 
     // 默认图片上传处理（使用本地预览）
     const defaultImageUploader = async (
       file: File
     ): Promise<UploadResponse> => {
       // 创建本地预览 URL
-      const url = URL.createObjectURL(file);
+      const url = URL.createObjectURL(file)
       return {
         success: 1,
         file: {
@@ -113,27 +110,29 @@ export default defineComponent({
           name: file.name,
           size: file.size,
         },
-      };
-    };
+      }
+    }
 
     // 默认文件上传处理
     const defaultFileUploader = async (file: File): Promise<UploadResponse> => {
-      const url = URL.createObjectURL(file);
+      const url = URL.createObjectURL(file)
       return {
         success: 1,
         file: {
           url,
           name: file.name,
           size: file.size,
-          extension: file.name.split(".").pop() || "",
+          extension: file.name.split('.').pop() || '',
           title: file.name, // 默认使用文件名作为标题
         },
-      };
-    };
+      }
+    }
 
     onMounted(() => {
+      if (!editorRef.value) return
+
       editorInstance.value = new EditorJS({
-        holder: props.holderId,
+        holder: editorRef.value,
         placeholder: props.placeholder,
 
         // 只读模式
@@ -151,7 +150,7 @@ export default defineComponent({
           header: {
             class: Header,
             config: {
-              placeholder: "输入标题",
+              placeholder: '输入标题',
               levels: [1, 2, 3, 4, 5, 6],
               defaultLevel: 2,
             },
@@ -162,7 +161,7 @@ export default defineComponent({
             class: Paragraph,
             inlineToolbar: true,
             config: {
-              placeholder: "输入文本",
+              placeholder: '输入文本',
             },
           },
 
@@ -171,7 +170,7 @@ export default defineComponent({
             class: NestedList,
             inlineToolbar: true,
             config: {
-              defaultStyle: "unordered",
+              defaultStyle: 'unordered',
             },
           },
 
@@ -187,10 +186,10 @@ export default defineComponent({
                 uploadByFile: async (file: File) => {
                   // 如果提供了自定义上传函数，使用它
                   if (props.onUploadImage) {
-                    return await props.onUploadImage(file);
+                    return await props.onUploadImage(file)
                   }
                   // 否则使用默认的本地预览
-                  return await defaultImageUploader(file);
+                  return await defaultImageUploader(file)
                 },
                 /**
                  * 通过 URL 上传图片
@@ -200,7 +199,7 @@ export default defineComponent({
                   return {
                     success: 1,
                     file: { url },
-                  };
+                  }
                 },
               },
             },
@@ -210,7 +209,7 @@ export default defineComponent({
           code: {
             class: Code,
             config: {
-              placeholder: "输入代码",
+              placeholder: '输入代码',
             },
           },
 
@@ -218,7 +217,7 @@ export default defineComponent({
           linkTool: {
             class: LinkTool,
             config: {
-              endpoint: "/api/fetchUrl", // 需要后端支持
+              endpoint: '/api/fetchUrl', // 需要后端支持
             },
           },
 
@@ -227,8 +226,8 @@ export default defineComponent({
             class: Quote,
             inlineToolbar: true,
             config: {
-              quotePlaceholder: "输入引用",
-              captionPlaceholder: "引用来源",
+              quotePlaceholder: '输入引用',
+              captionPlaceholder: '引用来源',
             },
           },
 
@@ -264,8 +263,8 @@ export default defineComponent({
                 vimeo: true,
                 imgur: true,
                 gfycat: true,
-                "twitch-video": true,
-                "twitch-channel": true,
+                'twitch-video': true,
+                'twitch-channel': true,
                 github: true,
               },
             },
@@ -276,8 +275,8 @@ export default defineComponent({
             class: Warning,
             inlineToolbar: true,
             config: {
-              titlePlaceholder: "标题",
-              messagePlaceholder: "消息",
+              titlePlaceholder: '标题',
+              messagePlaceholder: '消息',
             },
           },
 
@@ -301,8 +300,8 @@ export default defineComponent({
           attaches: {
             class: AttachesTool,
             config: {
-              endpoint: "/api/upload/file", // 可选：服务器端点
-              buttonText: "选择文件",
+              endpoint: '/api/upload/file', // 可选：服务器端点
+              buttonText: '选择文件',
               uploader: {
                 /**
                  * 上传附件文件
@@ -311,48 +310,48 @@ export default defineComponent({
                 uploadByFile: async (file: File) => {
                   // 如果提供了自定义上传函数，使用它
                   if (props.onUploadFile) {
-                    return await props.onUploadFile(file);
+                    return await props.onUploadFile(file)
                   }
                   // 否则使用默认的本地预览
-                  return await defaultFileUploader(file);
+                  return await defaultFileUploader(file)
                 },
               },
             },
           },
         },
 
-        onChange: async (api) => {
+        onChange: async api => {
           if (props.onChange) {
-            const data = await api.saver.save();
-            props.onChange(data);
+            const data = await api.saver.save()
+            props.onChange(data)
           }
         },
 
         onReady: () => {
           if (props.onReady) {
-            props.onReady();
+            props.onReady()
           }
         },
-      });
-    });
+      })
+    })
 
     // 监听 readOnly 变化，动态切换编辑器的只读状态
     watch(
       () => props.readOnly,
-      async (newValue) => {
+      async newValue => {
         if (editorInstance.value && editorInstance.value.readOnly) {
-          await editorInstance.value.readOnly.toggle(newValue);
+          await editorInstance.value.readOnly.toggle(newValue)
         }
       }
-    );
+    )
 
     onBeforeUnmount(() => {
       if (editorInstance.value) {
-        editorInstance.value.destroy();
-        editorInstance.value = null;
+        editorInstance.value.destroy()
+        editorInstance.value = null
       }
-    });
+    })
 
-    return () => <div id={props.holderId}></div>;
+    return () => <div ref={editorRef}></div>
   },
-});
+})
