@@ -42,6 +42,7 @@ export default defineConfig(({ mode }) => {
 
   // Demo/development build configuration
   return {
+    base: mode === 'production' ? '/vue-editorjs/' : '/',
     plugins: [vue(), vueJsx()],
   }
 })

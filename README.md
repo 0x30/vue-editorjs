@@ -2,6 +2,8 @@
 
 基于 Vue 3 + TypeScript 的 Editor.js 组件封装，内置 18 个常用插件和完整的中文国际化支持。
 
+📺 [在线预览](https://0x30.github.io/vue-editorjs/)
+
 ## 特性
 
 - ✅ Vue 3 + TypeScript + TSX 支持
